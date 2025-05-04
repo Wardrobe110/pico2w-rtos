@@ -1,4 +1,4 @@
-#pragma ONCE
+#pragma once
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include <stdio.h>
@@ -7,9 +7,11 @@
 #include "pico/multicore.h"
 #include "task.h"
 #include "pico/async_context_freertos.h"
+#include "pico/cyw43_arch.h"
 
-extern EventGroupHandle_t xISREventGroup;
+//Globals
 extern uint32_t global_int32;
+extern EventGroupHandle_t xISREventGroup;
 
 //Pin defines
 #define UART_ID uart0
@@ -28,10 +30,12 @@ extern uint32_t global_int32;
 
 
 //Task priorites
-#define MAIN_TASK_PRIORITY 9
-#define BUTTON_PRIORITY 4
+#define MAIN_TASK_PRIORITY ( tskIDLE_PRIORITY + 5UL )
+#define BUTTON_PRIORITY ( tskIDLE_PRIORITY + 1UL )
+#define BLINKER_PRIORITY ( tskIDLE_PRIORITY + 1UL )
 
 
 //Task stacks
 #define MAIN_STACK_SIZE 5096
 #define BUTTON_STACK_SIZE 512
+#define BLINKER_STACK_SIZE 512

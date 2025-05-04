@@ -2,4 +2,4 @@
 //xEventGroupsWaitBits
 //xEventGroupsSetBits
 
-static void task_buttons(void *ptr);
+void task_buttons(__unused void *params);

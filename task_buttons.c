@@ -1,7 +1,5 @@
 #include "task_buttons.h"
-
-
-static void task_buttons(void *ptr){
+void task_buttons(__unused void *params){
 
     printf("AAAAAAAAAAAAAA");
 };
