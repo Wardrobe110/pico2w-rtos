@@ -9,6 +9,7 @@
 #include "pico/async_context_freertos.h"
 #include "pico/cyw43_arch.h"
 #include "timers.h"
+#include "hardware/adc.h"
 
 //Globals
 extern uint32_t global_int32;
@@ -28,6 +29,9 @@ extern EventGroupHandle_t xBtnEventGroup;
 #define BTN_0 19
 #define BTN_1 20
 #define BTN_2 21
+
+#define KNOB_PIN 26
+#define SENSITIVITY 5
 
 //Button bits
 #define BTN_BIT_0 (1 << 0UL)

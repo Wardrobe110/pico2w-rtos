@@ -60,6 +60,7 @@ target_link_libraries(Rtos
         pico_cyw43_arch_none
         FreeRTOS-Kernel-Heap4
         pico_async_context_freertos
+        hardware_adc
         )
 
 pico_add_extra_outputs(Rtos)
