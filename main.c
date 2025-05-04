@@ -18,15 +18,24 @@ void btn_interrupt(uint gpio, uint32_t event_mask){
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 };
 
+//I need to use dma here
+//Clock div works at least for now
 void adc_interrupt(){
     static volatile uint16_t prevRead = 0;
     uint16_t result = adc_fifo_get();
 
     //This might just be insanely stupid idea?
+    //I highly doubt this saves cycles
     if(abs((int)prevRead - (int)result) < SENSITIVITY) return;
-
     prevRead = result;
-    printf("Adc input: %d", result);
+
+    //printf("Adc input: %d", result);
+    
+    //There has to be a way to cleanly map this to intigers from 0 to 100
+    //sth like clamp down(result/2.53)?
+    dancefloorBrighness = result / 2.55;
+
+    //printf("Calc val: %f\n", dancefloorBrighness);
 }
 
 
@@ -72,10 +81,13 @@ void general_setup(){
     gpio_disable_pulls(KNOB_PIN);
     gpio_set_input_enabled(KNOB_PIN, false);
     
-    adc_fifo_setup(true, false, 1, false, false);
+    //We byte shift it by degault
+    adc_fifo_setup(true, false, 1, false, true);
     adc_irq_set_enabled(true);
     irq_set_exclusive_handler(ADC_IRQ_FIFO, adc_interrupt); // Set ISR
     irq_set_enabled(ADC_IRQ_FIFO, true); 
+    //5 times per second assuming 150MHz clock
+    adc_set_clkdiv(312500);
     //Might need to be moved in case we use more than 1 adc
     adc_select_input(KNOB_PIN - 26);
 

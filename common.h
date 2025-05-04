@@ -14,6 +14,7 @@
 //Globals
 extern uint32_t global_int32;
 extern EventGroupHandle_t xBtnEventGroup;
+extern float dancefloorBrighness;
 
 //Pin defines
 #define UART_ID uart0
