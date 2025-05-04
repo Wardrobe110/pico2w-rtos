@@ -1,19 +1,21 @@
 #include "common.h"
 #include "task_buttons.h"
 #include "task_blinker.h"
+#include "task_leds.h"
 
 
 void btn_interrupt(uint gpio, uint32_t event_mask){
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     int btn = 0;
     if(gpio == BTN_0){
-        btn = BTN_0;
+        btn = BTN_BIT_0;
     }else if(gpio == BTN_1){
-        btn = BTN_0;
+        btn = BTN_BIT_1;
     }else if(gpio == BTN_2){
-        btn = BTN_0;
+        btn = BTN_BIT_2;
     };
     xTaskNotifyFromISR(xButtonTaskHandle, btn, eSetBits, &xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 };
 
 void general_setup(){
@@ -28,6 +30,7 @@ void general_setup(){
     gpio_init(BTN_0);
     gpio_set_dir(BTN_0, false);
     gpio_pull_up(BTN_0);
+    //Why both rise and fall?
     gpio_set_irq_enabled(BTN_0, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
 
     gpio_init(BTN_1);
@@ -55,10 +58,11 @@ void general_setup(){
 
 void main_task(void *ptr){
 
-    xISREventGroup = xEventGroupCreate();
+    xBtnEventGroup = xEventGroupCreate();
 
-    xTaskCreate(task_buttons, "task_btn", BUTTON_STACK_SIZE, NULL, BUTTON_PRIORITY, xButtonTaskHandle);
     xTaskCreate(task_blinker, "blinker", BLINKER_STACK_SIZE, NULL, BLINKER_PRIORITY, _NULL);
+    xTaskCreate(task_buttons, "buttons", BUTTON_STACK_SIZE, NULL, BUTTON_PRIORITY, &xButtonTaskHandle);
+    xTaskCreate(task_leds, "leds", LED_STACK_SIZE, NULL, LED_PRIORITY, _NULL);
 
     /*
     int count = 0;

@@ -12,7 +12,7 @@
 
 //Globals
 extern uint32_t global_int32;
-extern EventGroupHandle_t xISREventGroup;
+extern EventGroupHandle_t xBtnEventGroup;
 
 //Pin defines
 #define UART_ID uart0
@@ -37,7 +37,7 @@ extern EventGroupHandle_t xISREventGroup;
 //Task priorites
 #define MAIN_TASK_PRIORITY ( tskIDLE_PRIORITY + 5UL )
 #define BUTTON_PRIORITY ( tskIDLE_PRIORITY + 4UL )
-#define BLINKER_PRIORITY ( tskIDLE_PRIORITY + 1UL )
+#define BLINKER_PRIORITY ( tskIDLE_PRIORITY + 0UL )
 #define LED_PRIORITY ( tskIDLE_PRIORITY + 1UL )
 
 //Task stacks

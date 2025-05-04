@@ -3,8 +3,15 @@
 TaskHandle_t xButtonTaskHandle;
 
 void task_buttons(__unused void *pvParameter){
-    BaseType_t xResult;
+    BaseType_t notifyValue;
     while(1){
-        //xResult = xTaskNotify();
+        //Dont clear on entry, wipe on exit, store value here, wait for indefinite time
+        xTaskNotifyWait(0x00, 0xFF, &notifyValue, portMAX_DELAY);
+        //printf("Button port: %d\n", notifyValue);
+        
+        
+        if(notifyValue & BTN_BIT_0) xEventGroupSetBits(xBtnEventGroup, BTN_BIT_0);
+        if(notifyValue & BTN_BIT_1) xEventGroupSetBits(xBtnEventGroup, BTN_BIT_1);
+        if(notifyValue & BTN_BIT_2) xEventGroupSetBits(xBtnEventGroup, BTN_BIT_2);
     }
 };

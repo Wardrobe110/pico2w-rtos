@@ -41,6 +41,7 @@
         "event_groups.h": "c",
         "cstdlib": "c",
         "cyw43_arch.h": "c",
-        "task_buttons.h": "c"
+        "task_buttons.h": "c",
+        "common.h": "c"
     }
 }
