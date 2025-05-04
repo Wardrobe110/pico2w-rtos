@@ -8,6 +8,7 @@
 #include "task.h"
 #include "pico/async_context_freertos.h"
 #include "pico/cyw43_arch.h"
+#include "timers.h"
 
 //Globals
 extern uint32_t global_int32;
@@ -28,14 +29,19 @@ extern EventGroupHandle_t xISREventGroup;
 #define BTN_1 20
 #define BTN_2 21
 
+//Button bits
+#define BTN_BIT_0 (1 << 0UL)
+#define BTN_BIT_1 (1 << 1UL)
+#define BTN_BIT_2 (1 << 2UL)
 
 //Task priorites
 #define MAIN_TASK_PRIORITY ( tskIDLE_PRIORITY + 5UL )
-#define BUTTON_PRIORITY ( tskIDLE_PRIORITY + 1UL )
+#define BUTTON_PRIORITY ( tskIDLE_PRIORITY + 4UL )
 #define BLINKER_PRIORITY ( tskIDLE_PRIORITY + 1UL )
-
+#define LED_PRIORITY ( tskIDLE_PRIORITY + 1UL )
 
 //Task stacks
 #define MAIN_STACK_SIZE 5096
 #define BUTTON_STACK_SIZE 512
 #define BLINKER_STACK_SIZE 512
+#define LED_STACK_SIZE 512

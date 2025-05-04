@@ -2,4 +2,6 @@
 //xEventGroupsWaitBits
 //xEventGroupsSetBits
 
-void task_buttons(__unused void *params);
+extern TaskHandle_t xButtonTaskHandle;
+
+void task_buttons(__unused void *pvParameter);

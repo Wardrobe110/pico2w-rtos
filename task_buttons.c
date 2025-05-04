@@ -1,5 +1,10 @@
 #include "task_buttons.h"
-void task_buttons(__unused void *params){
 
-    printf("AAAAAAAAAAAAAA");
+TaskHandle_t xButtonTaskHandle;
+
+void task_buttons(__unused void *pvParameter){
+    BaseType_t xResult;
+    while(1){
+        //xResult = xTaskNotify();
+    }
 };
