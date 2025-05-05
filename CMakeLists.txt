@@ -37,10 +37,12 @@ include(FreeRTOS_Kernel_import.cmake)
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(Rtos main.c common.c task_blinker.c task_buttons.c task_leds.c)
+add_executable(Rtos main.c common.c task_blinker.c task_buttons.c task_leds.c task_dancefloor.c ws2812.pio)
 
 pico_set_program_name(Rtos "Rtos")
 pico_set_program_version(Rtos "0.1")
+
+pico_generate_pio_header(Rtos ${CMAKE_CURRENT_LIST_DIR}/ws2812.pio)
 
 # Modify the below lines to enable/disable output over UART/USB
 pico_enable_stdio_uart(Rtos 1)
@@ -61,6 +63,8 @@ target_link_libraries(Rtos
         FreeRTOS-Kernel-Heap4
         pico_async_context_freertos
         hardware_adc
+        hardware_pio
+        hardware_clocks
         )
 
 pico_add_extra_outputs(Rtos)

@@ -7,7 +7,7 @@ void task_leds(__unused void *pvParameter){
             xBtnEventGroup, BTN_BIT_2 | BTN_BIT_1 | BTN_BIT_0, pdTRUE, pdFALSE, portMAX_DELAY
         );
         
-        printf("Led bits: %d\n", bits);
+        //printf("Led bits: %d\n", bits);
         gpio_put_masked(1UL << LED_2 | 1UL << LED_1 | 1UL << LED_0, bits << LED_0);
     }   
 }

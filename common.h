@@ -11,10 +11,19 @@
 #include "timers.h"
 #include "hardware/adc.h"
 
+
+//Structs
+struct rgbData{
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;   
+};
+
 //Globals
 extern uint32_t global_int32;
 extern EventGroupHandle_t xBtnEventGroup;
 extern float dancefloorBrighness;
+extern struct rgbData dancefloorArray[16];
 
 //Pin defines
 #define UART_ID uart0
@@ -34,6 +43,7 @@ extern float dancefloorBrighness;
 #define KNOB_PIN 26
 #define SENSITIVITY 5
 
+#define WS2812B_PIN 15
 //Button bits
 #define BTN_BIT_0 (1 << 0UL)
 #define BTN_BIT_1 (1 << 1UL)
@@ -44,9 +54,11 @@ extern float dancefloorBrighness;
 #define BUTTON_PRIORITY ( tskIDLE_PRIORITY + 4UL )
 #define BLINKER_PRIORITY ( tskIDLE_PRIORITY + 0UL )
 #define LED_PRIORITY ( tskIDLE_PRIORITY + 1UL )
+#define DANCEFLOOR_PRIORITY ( tskIDLE_PRIORITY + 2UL )
 
 //Task stacks
 #define MAIN_STACK_SIZE 5096
 #define BUTTON_STACK_SIZE 512
 #define BLINKER_STACK_SIZE 512
 #define LED_STACK_SIZE 512
+#define DANCEFLOOR_STACK_SIZE 1024

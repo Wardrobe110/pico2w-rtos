@@ -2,6 +2,7 @@
 #include "task_buttons.h"
 #include "task_blinker.h"
 #include "task_leds.h"
+#include "task_dancefloor.h"
 
 
 void btn_interrupt(uint gpio, uint32_t event_mask){
@@ -20,7 +21,9 @@ void btn_interrupt(uint gpio, uint32_t event_mask){
 
 //I need to use dma here
 //Clock div works at least for now
+//Could also be timer interrupt
 void adc_interrupt(){
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     static volatile uint16_t prevRead = 0;
     uint16_t result = adc_fifo_get();
 
@@ -34,11 +37,13 @@ void adc_interrupt(){
     //There has to be a way to cleanly map this to intigers from 0 to 100
     //sth like clamp down(result/2.53)?
     dancefloorBrighness = result / 2.55;
-
     //printf("Calc val: %f\n", dancefloorBrighness);
+    xTaskNotifyFromISR(xDancefloorTaskHandle, 0, eNoAction, &xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    
 }
 
-
+//Will be moved to common
 void general_setup(){
     gpio_init(LED_0);
     gpio_set_dir(LED_0, true);
@@ -101,19 +106,7 @@ void main_task(void *ptr){
     xTaskCreate(task_blinker, "blinker", BLINKER_STACK_SIZE, NULL, BLINKER_PRIORITY, _NULL);
     xTaskCreate(task_buttons, "buttons", BUTTON_STACK_SIZE, NULL, BUTTON_PRIORITY, &xButtonTaskHandle);
     xTaskCreate(task_leds, "leds", LED_STACK_SIZE, NULL, LED_PRIORITY, _NULL);
-
-    /*
-    int count = 0;
-    while(true) {
-        static int last_core_id = -1;
-        if (portGET_CORE_ID() != last_core_id) {
-            last_core_id = portGET_CORE_ID();
-            printf("main task is on core %d\n", last_core_id);
-        }
-        printf("Hello from main task count=%u\n", count++);
-        vTaskDelay(3000);
-    }
-    */
+    xTaskCreate(task_dancefloor, "dancefloor", DANCEFLOOR_STACK_SIZE, NULL, DANCEFLOOR_PRIORITY, &xDancefloorTaskHandle);
 }
 
 void vLaunch(){
@@ -126,7 +119,8 @@ void vLaunch(){
 int main(){
     stdio_init_all();
     general_setup();
+    ws2812b_setup();
     vLaunch();
-    
+
     return 0;
 }
