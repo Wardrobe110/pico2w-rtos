@@ -37,7 +37,7 @@ include(FreeRTOS_Kernel_import.cmake)
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(Rtos main.c common.c task_blinker.c task_buttons.c task_leds.c task_dancefloor.c ws2812.pio)
+add_executable(Rtos main.c common.c task_blinker.c task_buttons.c task_leds.c task_dancefloor.c ws2812.pio task_uart.c)
 
 pico_set_program_name(Rtos "Rtos")
 pico_set_program_version(Rtos "0.1")
@@ -65,6 +65,10 @@ target_link_libraries(Rtos
         hardware_adc
         hardware_pio
         hardware_clocks
+        pico_stdlib
+        pico_aon_timer
+        hardware_clocks
+        hardware_pwm
         )
 
 pico_add_extra_outputs(Rtos)

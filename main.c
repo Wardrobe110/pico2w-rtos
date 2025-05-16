@@ -3,7 +3,7 @@
 #include "task_blinker.h"
 #include "task_leds.h"
 #include "task_dancefloor.h"
-
+#include "task_uart.h"
 
 void btn_interrupt(uint gpio, uint32_t event_mask){
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -18,10 +18,13 @@ void btn_interrupt(uint gpio, uint32_t event_mask){
     xTaskNotifyFromISR(xButtonTaskHandle, btn, eSetBits, &xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 };
-
+//============================
 //I need to use dma here
 //Clock div works at least for now
 //Could also be timer interrupt
+
+//There is no need for all that
+//just use read in the main loop
 void adc_interrupt(){
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     static volatile uint16_t prevRead = 0;
@@ -45,30 +48,7 @@ void adc_interrupt(){
 
 //Will be moved to common
 void general_setup(){
-    gpio_init(LED_0);
-    gpio_set_dir(LED_0, true);
-    gpio_init(LED_1);
-    gpio_set_dir(LED_1, true);
-    gpio_init(LED_2);
-    gpio_set_dir(LED_2, true);
-
-    //Could be done with for to reduce line number
-    gpio_init(BTN_0);
-    gpio_set_dir(BTN_0, false);
-    gpio_pull_up(BTN_0);
-    //Why both rise and fall?
-    gpio_set_irq_enabled(BTN_0, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
-
-    gpio_init(BTN_1);
-    gpio_set_dir(BTN_1, false);
-    gpio_pull_up(BTN_1);
-    gpio_set_irq_enabled(BTN_1, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
-
-    gpio_init(BTN_2);
-    gpio_set_dir(BTN_2, false);
-    gpio_pull_up(BTN_2);
-    gpio_set_irq_enabled(BTN_2, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
-
+    buttonSetup();
     gpio_set_irq_enabled_with_callback(BTN_0, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &btn_interrupt);
 
     //Method for insane ppl
@@ -97,6 +77,10 @@ void general_setup(){
     adc_select_input(KNOB_PIN - 26);
 
     adc_run(true);
+
+    uart_setup();
+    memset(&globalTimer, 0, sizeof(globalTimer));
+    aon_timer_start(&globalTimer);
 }
 
 void main_task(void *ptr){
@@ -107,6 +91,7 @@ void main_task(void *ptr){
     xTaskCreate(task_buttons, "buttons", BUTTON_STACK_SIZE, NULL, BUTTON_PRIORITY, &xButtonTaskHandle);
     xTaskCreate(task_leds, "leds", LED_STACK_SIZE, NULL, LED_PRIORITY, _NULL);
     xTaskCreate(task_dancefloor, "dancefloor", DANCEFLOOR_STACK_SIZE, NULL, DANCEFLOOR_PRIORITY, &xDancefloorTaskHandle);
+    xTaskCreate(task_uart, "uart", UART_STACK_SIZE, NULL, UART_PRIORITY, &xUartTaskHandle);
 }
 
 void vLaunch(){
@@ -122,5 +107,8 @@ int main(){
     ws2812b_setup();
     vLaunch();
 
+    while(1){
+        sleep_ms(1000);
+    }
     return 0;
 }

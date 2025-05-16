@@ -10,6 +10,11 @@
 #include "pico/cyw43_arch.h"
 #include "timers.h"
 #include "hardware/adc.h"
+#include "hardware/watchdog.h"
+#include "hardware/pwm.h"
+#include <string.h>
+#include "pico/aon_timer.h"
+
 
 
 //Structs
@@ -24,6 +29,12 @@ extern uint32_t global_int32;
 extern EventGroupHandle_t xBtnEventGroup;
 extern float dancefloorBrighness;
 extern struct rgbData dancefloorArray[16];
+    //Uart globals
+#define UART_BUF_LEN 32
+extern char uartBuffer[2][32];
+extern uint32_t uartIndex;
+    //Timer
+extern struct timespec globalTimer;
 
 //Pin defines
 #define UART_ID uart0
@@ -44,6 +55,15 @@ extern struct rgbData dancefloorArray[16];
 #define SENSITIVITY 5
 
 #define WS2812B_PIN 15
+
+#define UART_ID uart0
+#define BAUD_RATE 115200
+#define UART_TX_PIN 4
+#define UART_RX_PIN 5
+
+#define OLED_SDA 12
+#define OLED_SCL 13
+
 //Button bits
 #define BTN_BIT_0 (1 << 0UL)
 #define BTN_BIT_1 (1 << 1UL)
@@ -55,6 +75,7 @@ extern struct rgbData dancefloorArray[16];
 #define BLINKER_PRIORITY ( tskIDLE_PRIORITY + 0UL )
 #define LED_PRIORITY ( tskIDLE_PRIORITY + 1UL )
 #define DANCEFLOOR_PRIORITY ( tskIDLE_PRIORITY + 2UL )
+#define UART_PRIORITY ( tskIDLE_PRIORITY + 4UL )
 
 //Task stacks
 #define MAIN_STACK_SIZE 5096
@@ -62,3 +83,8 @@ extern struct rgbData dancefloorArray[16];
 #define BLINKER_STACK_SIZE 512
 #define LED_STACK_SIZE 512
 #define DANCEFLOOR_STACK_SIZE 1024
+#define UART_STACK_SIZE 1024
+
+int str_to_dec(char *str);
+
+void buttonSetup();
